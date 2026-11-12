@@ -41,7 +41,7 @@ node --test test/palette.test.cjs
 
 Excel 文件由随项目分发的 [ExcelJS 4.4.0](app/vendor/README.md) 生成。
 
-## 数据来源怎么连设计文档也放到了 GitHub 的发布包里吗？这是过程文件，不需要发布啊。
+## 数据来源
 
 色板数据来自 [Zippland/perler-beads](https://github.com/Zippland/perler-beads)，版权 © Zippland。项目使用其 [colorSystemMapping.json](https://github.com/Zippland/perler-beads/blob/2519daf1628534e414bc7a10f0472dc32000bde4/src/app/colorSystemMapping.json) 转换为 `app/data.js`，包含 291 种颜色和五个品牌的色号。上游数据快照和许可声明详见 [第三方声明](THIRD_PARTY_NOTICES.md)。
 
