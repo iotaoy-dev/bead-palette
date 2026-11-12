@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拼豆色板工坊</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="style.css?v=35">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-mark">
+    <span class="bead-mini c1"></span>
+    <span class="bead-mini c2"></span>
+    <span class="bead-mini c3"></span>
+    <h1>拼豆色板工坊</h1>
+  </div>
+  <div class="controls">
+    <select id="brand-sel" aria-label="当前品牌" title="切换整个色板的品牌，保留已选颜色"></select>
+    <select id="view-sel" title="排序方式" aria-label="排序方式">
+      <option value="lib">色号排序</option>
+      <option value="hue">色相排序</option>
+    </select>
+    <div class="search-wrap" id="search-wrap">
+      <button id="search-toggle" class="icon-btn" title="搜索色号 / #HEX" aria-label="搜索">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <input id="search" type="search" aria-label="搜索色号或 HEX" placeholder="色号或 #HEX" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+</header>
+
+<main>
+  <p id="keyboard-hint" class="sr-only">使用方向键浏览色块，按空格或回车切换选中状态。</p>
+  <section class="lib-wrap">
+    <div id="library" class="library" aria-label="颜色全库">
+      <footer id="attribution" class="attribution">
+        <a href="LICENSE.txt" target="_blank" rel="noopener noreferrer">AGPL-3.0</a>
+        <span aria-hidden="true"> · </span>
+        <a href="https://github.com/iotaoy-dev/bead-palette" target="_blank" rel="noopener noreferrer" aria-label="Bead Palette 源码（GitHub）">GitHub</a>
+        <span aria-hidden="true"> · </span>
+        <span>色板数据 © <a href="https://github.com/Zippland/perler-beads" target="_blank" rel="noopener noreferrer">Zippland</a></span>
+      </footer>
+    </div>
+    <div id="rail" class="rail" aria-label="系列索引"></div>
+  </section>
+</main>
+
+<div class="dock" role="toolbar" aria-label="色板操作">
+  <button id="only-sel" class="toggle" aria-pressed="false" title="只显示已加入色板的颜色">只看已选</button>
+  <button id="select-all" class="ghost" title="将全库所有颜色加入色板">全选</button>
+  <button id="deselect-all" class="ghost" title="从色板移出所有颜色" disabled>全不选</button>
+  <button id="open-import" class="ghost" title="拍照 → AI 识别 → 粘贴">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10"/><path d="M8 9.5l4 4 4-4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+    <span>导入</span>
+  </button>
+  <div class="export-control" id="export-control">
+    <button id="open-export" class="primary" type="button" title="选择导出格式" aria-expanded="false" aria-controls="export-menu" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>导出</span><span id="sel-count" class="count">0</span></button>
+    <div id="export-menu" class="export-menu hidden" role="group" aria-label="导出格式">
+      <button id="export-gpl" type="button">GPL 色板 <span>.gpl</span></button>
+      <button id="export-xlsx" type="button">Excel 表格 <span>.xlsx</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="modal-title" class="modal-title">批量导入色号</h2>
+      <button id="modal-close" class="ghost" aria-label="关闭">✕</button>
+    </div>
+
+    <div id="tab-import" class="tab-body">
+      <ol class="steps">
+        <li><b>拍下色卡标签</b>，将照片发给 AI 助手识别。</li>
+        <li><b>复制识别提示词</b>，和照片一起发送。
+          <div class="prompt-actions">
+            <button id="copy-prompt" class="ghost">复制提示词</button>
+            <details class="prompt-details"><summary>查看提示词</summary><code id="agent-prompt"></code></details>
+          </div>
+        </li>
+        <li><label for="paste-area"><b>粘贴识别结果</b></label>，按当前品牌 <b id="paste-brand">MARD</b> 校验。请粘贴该品牌的色号。</li>
+      </ol>
+      <textarea id="paste-area" rows="4" placeholder="A1, A5, B12, C2, E7" spellcheck="false"></textarea>
+      <div class="paste-actions">
+        <button id="parse-paste" class="primary">解析并核对</button>
+      </div>
+      <div class="import-secondary">
+        <button id="choose-gpl" type="button">从 GPL 文件导入</button>
+        <input id="gpl-file" type="file" accept=".gpl,text/plain" hidden>
+      </div>
+    </div>
+
+    <div id="review" class="review hidden">
+      <div class="review-head">
+        <h3 id="review-heading">校验识别结果</h3>
+        <span id="review-stat" class="review-stat"></span>
+      </div>
+      <div id="review-list" class="review-list" tabindex="-1" aria-label="待核对色号"></div>
+      <div class="review-foot">
+        <button id="review-cancel" class="ghost">返回修改</button>
+        <button id="review-add" class="primary">加入色板</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<script src="data.js?v=22"></script>
+<script src="vendor/exceljs.min.js"></script>
+<script src="palette.js?v=1"></script>
+<script src="palette-export.js?v=2"></script>
+<script src="app.js?v=29"></script>
+</body>
+</html>

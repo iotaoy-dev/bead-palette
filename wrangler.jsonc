@@ -1,0 +1,15 @@
+{
+  "name": "bead-palette",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./app"
+  },
+  "routes": [
+    {
+      "pattern": "beadpalette.top1pi.com",
+      "custom_domain": true
+    }
+  ]
+}
