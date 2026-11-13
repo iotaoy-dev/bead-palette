@@ -107,10 +107,9 @@ main { flex: 1; min-height: 0; display: flex; }
 .library::-webkit-scrollbar { width: 10px; }
 .library::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
 
-/* 系列分组头（吸附，独占一行） */
+/* 系列分组头（独占一行，随列表滚动） */
 .group-head {
   grid-column: 1 / -1;
-  position: sticky; top: -14px; z-index: 3;
   background: var(--bg);
   padding: 9px 2px 5px;
   font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent);
@@ -346,7 +345,7 @@ button.ghost:disabled { color: var(--ink-faint); opacity: .5; cursor: not-allowe
   .tile { border-radius: 8px; }
   .bead { margin-bottom: 3px; }
   .bead::after { inset: 6px; }
-  .group-head { font-size: 12px; top: -10px; }
+  .group-head { font-size: 12px; }
   button.ghost { padding: 7px 11px; font-size: 12.5px; }
   button.primary { padding: 7px 12px; font-size: 12.5px; }
   .toast { bottom: 74px; }

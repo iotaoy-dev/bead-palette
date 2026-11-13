@@ -97,6 +97,7 @@ test('晚返回的 GPL 文件不覆盖新粘贴结果或已关闭的核对', asy
   };
   const ui = vm.createContext({
     localStorage: { getItem: () => null },
+    window: { addEventListener() {} },
     document: { querySelector: node, createElement: () => ({}), addEventListener() {} },
   });
   vm.runInContext(browserScripts, ui);

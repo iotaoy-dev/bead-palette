@@ -85,14 +85,28 @@ function addExactSearch() {
   const result = added ? `已加入 ${added} 色` : matches.length ? '匹配色号已在色板中' : '没有完整匹配的色号';
   toast(unmatched.length ? `${result}；未匹配或有歧义：${unmatched.join('、')}` : result);
 }
+// 标题随列表滚动，用它在滚动容器中的位置定位分组。
+function groupTop(head, lib) {
+  return lib.scrollTop + head.getBoundingClientRect().top - lib.getBoundingClientRect().top;
+}
+function fitLastGroup() {
+  const lib = $('#library');
+  lib.style.removeProperty('padding-bottom');
+  const last = [...lib.querySelectorAll('.group-head')].at(-1);
+  if (!last) return;
+  const style = getComputedStyle(lib);
+  const target = groupTop(last, lib);
+  const shortage = target - (lib.scrollHeight - lib.clientHeight);
+  if (shortage > 0) lib.style.paddingBottom = `${parseFloat(style.paddingBottom) + shortage + 1}px`;
+}
 function updateRail() {
   const lib = $('#library');
   const heads = [...lib.querySelectorAll('.group-head')];
   if (!heads.length) return;
-  const top = lib.getBoundingClientRect().top;
+  const top = lib.scrollTop + 2;
   let current = heads[0];
   for (const head of heads) {
-    if (head.getBoundingClientRect().top <= top + 18) current = head;
+    if (groupTop(head, lib) <= top) current = head;
   }
   for (const button of $('#rail').querySelectorAll('button')) {
     const active = button.dataset.group === current.id;
@@ -169,7 +183,9 @@ function renderLibrary() {
       const rb = el('button', '', esc(key));
       rb.title = '跳到 ' + key;
       rb.dataset.group = head.id;
-      rb.addEventListener('click', () => $('#grp-' + CSS.escape(key))?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      rb.addEventListener('click', () => {
+        lib.scrollTo({ top: groupTop(head, lib), behavior: 'smooth' });
+      });
       rail.appendChild(rb);
     }
     for (const c of items) {
@@ -241,6 +257,7 @@ function renderLibrary() {
   lib.appendChild(frag);
   lib.appendChild(attribution);
   rail.classList.toggle('hidden', state.view !== 'lib' || groups.size <= 1);
+  fitLastGroup();
   updateRail();
 }
 
@@ -427,6 +444,7 @@ function bind() {
     }
   });
   $('#library').addEventListener('scroll', updateRail, { passive: true });
+  window.addEventListener('resize', () => { fitLastGroup(); updateRail(); });
   // 导出 / 清空
   const exportControl = $('#export-control');
   const exportMenu = $('#export-menu');
